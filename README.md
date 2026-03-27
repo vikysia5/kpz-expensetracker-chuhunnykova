@@ -9,6 +9,7 @@ Expense Tracker — веб-застосунок для обліку особис
 - Мова програмування: Node.js 20
 - Фреймворк: Express.js
 - База даних: PostgreSQL
+- ORM: Tortoise ORM
 
 ## Структура проєкту (буде доповнено)
 ```text
