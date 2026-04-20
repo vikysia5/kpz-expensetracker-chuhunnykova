@@ -1,0 +1,331 @@
+openapi: 3.0.3
+info:
+  title: Expense Tracker API
+  description: "API для обліку витрат користувачів, управління категоріями та аналітики."
+  version: 1.0.0
+servers:
+- url: http://localhost:8000/api/v1
+  description: Local development server
+paths:
+  /users:
+    get:
+      tags:
+      - Users
+      summary: Отримати список користувачів
+      responses:
+        "200":
+          description: Список користувачів
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      tags:
+      - Users
+      summary: Створити користувача
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+        required: true
+      responses:
+        "201":
+          description: Користувача створено
+        "422":
+          description: Помилка валідації
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /users/{id}:
+    get:
+      tags:
+      - Users
+      summary: Отримати користувача за ID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Користувача знайдено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Користувача не знайдено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      tags:
+      - Users
+      summary: Оновити користувача повністю
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+        required: true
+      responses:
+        "200":
+          description: Користувача оновлено
+        "404":
+          description: Не знайдено
+    delete:
+      tags:
+      - Users
+      summary: Видалити користувача
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: Користувача видалено
+        "404":
+          description: Не знайдено
+  /expenses:
+    get:
+      tags:
+      - Expenses
+      summary: Отримати список витрат
+      responses:
+        "200":
+          description: Список витрат
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Expense"
+    post:
+      tags:
+      - Expenses
+      summary: Додати нову витрату
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpenseCreate"
+        required: true
+      responses:
+        "201":
+          description: Витрату створено
+        "422":
+          description: Помилка даних
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /expenses/{id}:
+    get:
+      tags:
+      - Expenses
+      summary: Отримати витрату за ID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Витрату знайдено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Expense"
+        "404":
+          description: Не знайдено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+      - Expenses
+      summary: Видалити витрату
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: Видалено
+        "404":
+          description: Не знайдено
+    patch:
+      tags:
+      - Expenses
+      summary: Частково оновити витрату
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/expenses_id_body"
+        required: true
+      responses:
+        "200":
+          description: Витрату оновлено
+        "404":
+          description: Не знайдено
+  /categories:
+    get:
+      tags:
+      - Categories
+      summary: Отримати список категорій
+      responses:
+        "200":
+          description: Список категорій
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+    post:
+      tags:
+      - Categories
+      summary: Створити категорію
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryCreate"
+        required: true
+      responses:
+        "201":
+          description: Категорію створено
+        "422":
+          description: Помилка
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /categories/{id}:
+    delete:
+      tags:
+      - Categories
+      summary: Видалити категорію
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: Видалено
+        "404":
+          description: Не знайдено
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    UserCreate:
+      required:
+      - email
+      - name
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        name:
+          minLength: 2
+          type: string
+          example: Іван
+        password:
+          minLength: 8
+          type: string
+          format: password
+    Expense:
+      type: object
+      properties:
+        id:
+          type: integer
+        amount:
+          type: number
+        category_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+    ExpenseCreate:
+      required:
+      - amount
+      type: object
+      properties:
+        amount:
+          type: number
+          example: 150.5
+        category_id:
+          type: integer
+          example: 1
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    CategoryCreate:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: Продукти
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+          example: Ресурс не знайдено
+    expenses_id_body:
+      type: object
+      properties:
+        amount:
+          type: number
+        category_id:
+          type: integer
